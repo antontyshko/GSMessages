@@ -59,6 +59,10 @@ public enum GSMessageOption {
     case textAlignment(GSMessageTextAlignment)
     case textColor(UIColor)
     case textNumberOfLines(Int)
+    case shadowOffset(CGSize)
+    case shadowRadius(CGFloat)
+    case shadowOpacity(Float)
+    case shadowColor(CGColor)
 }
 
 extension UIViewController {
@@ -177,7 +181,7 @@ public class GSMessage: NSObject {
                 }
                 messageView.transform = CGAffineTransform(translationX: 0, y: y)
             }
-            
+     
             UIView.animate(withDuration: animationDuration, delay: 0, options: .curveEaseOut, animations: {
                 switch animation {
                 case .fade:
@@ -239,6 +243,7 @@ public class GSMessage: NSObject {
     public private(set) var messageView = UIView()
     public private(set) var messageText = UILabel()
     
+    
     public private(set) var accessibilityIdentifier: String?
     public private(set) var animations: [GSMessageAnimation] = [.slide(.normal)]
     public private(set) var animationDuration: TimeInterval = 0.25
@@ -255,6 +260,10 @@ public class GSMessage: NSObject {
     public private(set) var textAlignment: GSMessageTextAlignment = .center
     public private(set) var textColor: UIColor = .white
     public private(set) var textNumberOfLines: Int = 1
+    public private(set) var shadowOffset: CGSize = CGSize.zero
+    public private(set) var shadowRadius: CGFloat = 0
+    public private(set) var shadowOpacity: Float = 0
+    public private(set) var shadowColor: CGColor = UIColor.clear.cgColor
     
     public var messageWidth:  CGFloat {
         return inView.frame.width - margin.horizontal
@@ -279,22 +288,26 @@ public class GSMessage: NSObject {
 
         for option in options ?? [] {
             switch (option) {
-            case let .accessibilityIdentifier(value): accessibilityIdentifier = value
-            case let .animations(value): animations = value
-            case let .animationDuration(value): animationDuration = value
-            case let .autoHide(value): autoHide = value
-            case let .autoHideDelay(value): autoHideDelay = value
-            case let .cornerRadius(value): cornerRadius = CGFloat(value)
-            case let .height(value): height = CGFloat(value)
-            case let .hideOnTap(value): hideOnTap = value
-            case let .handleTap(value): handleTap = value
-            case let .isInsideSafeAreaInsets(value): isInsideSafeAreaInsets = value
-            case let .margin(value): margin = value
-            case let .padding(value): padding = value
-            case let .position(value): position = value
-            case let .textAlignment(value): textAlignment = value
-            case let .textColor(value): textColor = value
-            case let .textNumberOfLines(value): textNumberOfLines = value
+                case let .accessibilityIdentifier(value): accessibilityIdentifier = value
+                case let .animations(value): animations = value
+                case let .animationDuration(value): animationDuration = value
+                case let .autoHide(value): autoHide = value
+                case let .autoHideDelay(value): autoHideDelay = value
+                case let .cornerRadius(value): cornerRadius = CGFloat(value)
+                case let .height(value): height = CGFloat(value)
+                case let .hideOnTap(value): hideOnTap = value
+                case let .handleTap(value): handleTap = value
+                case let .isInsideSafeAreaInsets(value): isInsideSafeAreaInsets = value
+                case let .margin(value): margin = value
+                case let .padding(value): padding = value
+                case let .position(value): position = value
+                case let .textAlignment(value): textAlignment = value
+                case let .textColor(value): textColor = value
+                case let .textNumberOfLines(value): textNumberOfLines = value
+                case let .shadowColor(color): shadowColor = color
+                case let .shadowOffset(size): shadowOffset = size
+                case let .shadowRadius(radius): shadowRadius = radius
+                case let .shadowOpacity(opacity): shadowOpacity = opacity
             }
         }
         
@@ -318,6 +331,11 @@ public class GSMessage: NSObject {
         
         containerView.layer.zPosition = 1
         containerView.addSubview(messageView)
+        
+        containerView.layer.shadowOffset = shadowOffset
+        containerView.layer.shadowRadius = shadowRadius
+        containerView.layer.shadowOpacity = shadowOpacity
+        containerView.layer.shadowColor = shadowColor
 
         messageText.attributedText = attributedText
         messageText.numberOfLines = textNumberOfLines
